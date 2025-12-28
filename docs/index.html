@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Toy Projects</title>
+    <meta name="description" content="Small static toy projects hosted on GitHub Pages." />
+    <style>
+      :root { color-scheme: light dark; }
+      body { margin: 0; font: 16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
+      .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+      header { margin-bottom: 20px; }
+      h1 { margin: 0 0 6px; font-size: 28px; }
+      p { margin: 0; opacity: 0.85; }
+      .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 18px; }
+      a.card {
+        display: block; padding: 14px 14px; border: 1px solid rgba(127,127,127,0.35);
+        border-radius: 12px; text-decoration: none; color: inherit;
+      }
+      a.card:hover { border-color: rgba(127,127,127,0.7); transform: translateY(-1px); }
+      .title { font-weight: 650; margin-bottom: 6px; }
+      .meta { font-size: 13px; opacity: 0.75; }
+      footer { margin-top: 22px; font-size: 13px; opacity: 0.7; }
+      code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Toy Projects</h1>
+        <p>Static mini-apps in one repo. Pick a door, enter a cave.</p>
+      </header>
+
+      <section class="grid" aria-label="Projects">
+        <!-- Use relative links so it works under /<repo>/ on GitHub Pages -->
+        <a class="card" href="./card-picker/">
+          <div class="title">Card Picker App</div>
+          <div class="meta">/docs/card-picker/index.html</div>
+        </a>
+
+      </section>
+
+      <footer>
+        <div>Hosted on GitHub Pages. URLs look like <code>https://&lt;user&gt;.github.io/&lt;repo&gt;/</code></div>
+      </footer>
+    </div>
+  </body>
+</html>
