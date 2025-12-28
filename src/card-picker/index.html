@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Picker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Righteous&family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #FFF8F0;
+            --bg-secondary: #FFE8D6;
+            --text-primary: #2C1810;
+            --text-secondary: #5C3D2E;
+            --accent-primary: #D97941;
+            --accent-secondary: #2B7A78;
+            --card-back: #3D5A59;
+            --card-front: #FFF5EB;
+            --shadow: rgba(217, 121, 65, 0.15);
+            --shadow-strong: rgba(217, 121, 65, 0.25);
+            --pattern-color: rgba(217, 121, 65, 0.05);
+        }
+
+        [data-theme="dark"] {
+            --bg-primary: #1A1A1D;
+            --bg-secondary: #2D2D30;
+            --text-primary: #F4E9E1;
+            --text-secondary: #C5B8AD;
+            --accent-primary: #FF9B6A;
+            --accent-secondary: #4ECDC4;
+            --card-back: #3D5A59;
+            --card-front: #2D2D30;
+            --shadow: rgba(255, 155, 106, 0.2);
+            --shadow-strong: rgba(255, 155, 106, 0.3);
+            --pattern-color: rgba(255, 155, 106, 0.03);
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            transition: background 0.4s ease, color 0.4s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(45deg, var(--pattern-color) 0px, var(--pattern-color) 2px, transparent 2px, transparent 10px),
+                repeating-linear-gradient(-45deg, var(--pattern-color) 0px, var(--pattern-color) 2px, transparent 2px, transparent 10px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        h1 {
+            font-family: 'Righteous', cursive;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--accent-primary);
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+
+        .theme-toggle {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-primary);
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            box-shadow: 0 6px 16px var(--shadow-strong);
+        }
+
+        .input-section {
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 8px 24px var(--shadow);
+            animation: fadeInUp 0.6s ease-out 0.1s backwards;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            min-width: 250px;
+            padding: 1rem 1.5rem;
+            border: 2px solid var(--accent-secondary);
+            border-radius: 12px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        button {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-add {
+            background: var(--accent-secondary);
+            color: white;
+        }
+
+        .btn-add:hover {
+            background: #248682;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow-strong);
+        }
+
+        .btn-shuffle {
+            background: var(--accent-primary);
+            color: white;
+            padding: 1.2rem 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .btn-shuffle:hover:not(:disabled) {
+            background: #C96A37;
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 20px var(--shadow-strong);
+        }
+
+        .btn-shuffle:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .btn-reset:hover {
+            background: var(--text-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px var(--shadow-strong);
+        }
+
+        .items-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .item-tag {
+            background: var(--accent-primary);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .item-tag .remove {
+            cursor: pointer;
+            font-weight: bold;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .item-tag .remove:hover {
+            opacity: 1;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.6s ease-out 0.2s backwards;
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            perspective: 1000px;
+            margin-bottom: 3rem;
+        }
+
+        .card {
+            aspect-ratio: 3/4;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+            cursor: pointer;
+            animation: cardAppear 0.6s ease-out backwards;
+        }
+
+        .card.flipped {
+            transform: rotateY(180deg);
+            cursor: default;
+        }
+
+        .card.shuffling {
+            animation: shuffle 0.8s ease-in-out;
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px var(--shadow-strong);
+            transition: box-shadow 0.3s ease;
+        }
+
+        .card:hover:not(.flipped) .card-face {
+            box-shadow: 0 15px 40px var(--shadow-strong);
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, var(--card-back) 0%, #2B7A78 100%);
+            color: white;
+        }
+
+        .card-back::before {
+            content: '?';
+            font-family: 'Righteous', cursive;
+            font-size: 5rem;
+            opacity: 0.3;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .card-front {
+            background: var(--card-front);
+            color: var(--text-primary);
+            transform: rotateY(180deg);
+            border: 3px solid var(--accent-primary);
+        }
+
+        .card-content {
+            font-family: 'Righteous', cursive;
+            font-size: 1.5rem;
+            text-align: center;
+            word-wrap: break-word;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-section {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border-radius: 20px;
+            box-shadow: 0 8px 24px var(--shadow);
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.4s ease;
+        }
+
+        .result-section.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .result-title {
+            font-family: 'Righteous', cursive;
+            font-size: 1.5rem;
+            color: var(--accent-secondary);
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .result-value {
+            font-family: 'Righteous', cursive;
+            font-size: 3rem;
+            color: var(--accent-primary);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+            }
+            to {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(50px) rotateY(-20deg);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) rotateY(0);
+            }
+        }
+
+        @keyframes shuffle {
+            0% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+            }
+            25% {
+                transform: translateX(-30px) translateY(-20px) rotate(-10deg);
+            }
+            50% {
+                transform: translateX(30px) translateY(-30px) rotate(10deg);
+            }
+            75% {
+                transform: translateX(-20px) translateY(-10px) rotate(-5deg);
+            }
+            100% {
+                transform: translateX(0) translateY(0) rotate(0deg);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .theme-toggle {
+                top: 1rem;
+                right: 1rem;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            input[type="text"] {
+                min-width: 100%;
+            }
+
+            .cards-container {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 1rem;
+            }
+
+            .result-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">🌙</button>
+
+    <div class="container">
+        <header>
+            <h1>Card Picker</h1>
+            <p class="subtitle">Add your options, shuffle, and pick your fate</p>
+        </header>
+
+        <div class="input-section">
+            <div class="input-group">
+                <input type="text" id="itemInput" placeholder="Enter an option (e.g., Pizza, Sushi, Burger...)" />
+                <button class="btn-add" id="addBtn">Add</button>
+            </div>
+            <div class="items-list" id="itemsList"></div>
+        </div>
+
+        <div class="controls">
+            <button class="btn-shuffle" id="shuffleBtn" disabled>Shuffle & Start</button>
+            <button class="btn-reset" id="resetBtn">Reset All</button>
+        </div>
+
+        <div class="cards-container" id="cardsContainer"></div>
+
+        <div class="result-section" id="resultSection">
+            <div class="result-title">You Picked:</div>
+            <div class="result-value" id="resultValue"></div>
+        </div>
+    </div>
+
+    <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const html = document.documentElement;
+        
+        // Load saved theme
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        html.setAttribute('data-theme', savedTheme);
+        themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
+
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            html.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+        });
+
+        // App State
+        let items = [];
+        let shuffledItems = [];
+        let isShuffled = false;
+
+        // DOM Elements
+        const itemInput = document.getElementById('itemInput');
+        const addBtn = document.getElementById('addBtn');
+        const itemsList = document.getElementById('itemsList');
+        const shuffleBtn = document.getElementById('shuffleBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const cardsContainer = document.getElementById('cardsContainer');
+        const resultSection = document.getElementById('resultSection');
+        const resultValue = document.getElementById('resultValue');
+
+        // Add Item
+        function addItem() {
+            const value = itemInput.value.trim();
+            if (value && !items.includes(value)) {
+                items.push(value);
+                renderItemsList();
+                itemInput.value = '';
+                updateShuffleButton();
+            }
+        }
+
+        addBtn.addEventListener('click', addItem);
+        itemInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addItem();
+        });
+
+        // Render Items List
+        function renderItemsList() {
+            itemsList.innerHTML = items.map((item, index) => `
+                <div class="item-tag">
+                    <span>${item}</span>
+                    <span class="remove" onclick="removeItem(${index})">✕</span>
+                </div>
+            `).join('');
+        }
+
+        // Remove Item
+        function removeItem(index) {
+            items.splice(index, 1);
+            renderItemsList();
+            updateShuffleButton();
+            if (isShuffled) {
+                cardsContainer.innerHTML = '';
+                isShuffled = false;
+            }
+        }
+
+        // Update Shuffle Button
+        function updateShuffleButton() {
+            shuffleBtn.disabled = items.length < 2;
+        }
+
+        // Shuffle Array
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        // Shuffle and Create Cards
+        shuffleBtn.addEventListener('click', () => {
+            shuffledItems = shuffleArray(items);
+            isShuffled = true;
+            resultSection.classList.remove('show');
+            createCards();
+        });
+
+        // Create Cards
+        function createCards() {
+            cardsContainer.innerHTML = '';
+            
+            shuffledItems.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'card shuffling';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                card.innerHTML = `
+                    <div class="card-face card-back"></div>
+                    <div class="card-face card-front">
+                        <div class="card-content">${item}</div>
+                    </div>
+                `;
+                
+                card.addEventListener('click', () => flipCard(card, item));
+                cardsContainer.appendChild(card);
+
+                // Remove shuffling animation after it completes
+                setTimeout(() => {
+                    card.classList.remove('shuffling');
+                }, 800 + (index * 100));
+            });
+        }
+
+        // Flip Card
+        function flipCard(card, item) {
+            if (card.classList.contains('flipped')) return;
+            
+            card.classList.add('flipped');
+            
+            setTimeout(() => {
+                resultValue.textContent = item;
+                resultSection.classList.add('show');
+            }, 300);
+        }
+
+        // Reset All
+        resetBtn.addEventListener('click', () => {
+            items = [];
+            shuffledItems = [];
+            isShuffled = false;
+            itemsList.innerHTML = '';
+            cardsContainer.innerHTML = '';
+            resultSection.classList.remove('show');
+            updateShuffleButton();
+        });
+
+        // Initialize
+        updateShuffleButton();
+    </script>
+</body>
+</html>
